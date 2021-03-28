@@ -19,7 +19,7 @@ public class Main extends Application {
     public ArrayList<Line> needles = new ArrayList<Line>(); // objetos de agujas almacenados
     public Group content = new Group(); // grupo de las lineas lanzadas (agujas)
     public VBox layout = new VBox(2); // panel a desplegar
-    public Line column1, column2, column3, column4, column5;
+    public Line[] columns = new Line[5]; // arreglo de columnas
     public Random randy = new Random();
     public int dVerticales = 200; // distancia entre verticales
     public static double nExperiments, nSuccess = 0;
@@ -36,21 +36,11 @@ public class Main extends Application {
     }
 
     public void columns() {
-        column1 = new Line(0, 0, 0, 600);
-        column1.setStrokeWidth(3);
-        content.getChildren().add(column1);
-        column2 = new Line(200, 0, 200, 600);
-        column2.setStrokeWidth(3);
-        content.getChildren().add(column2);
-        column3 = new Line(400, 0, 400, 600);
-        column3.setStrokeWidth(3);
-        content.getChildren().add(column3);
-        column4 = new Line(600, 0, 600, 600);
-        column4.setStrokeWidth(3);
-        content.getChildren().add(column4);
-        column5 = new Line(800, 0, 800, 600);
-        column5.setStrokeWidth(3);
-        content.getChildren().add(column5);
+        for (int i = 0; i < columns.length; i++) {
+            columns[i] = new Line(dVerticales * i, 0, dVerticales * i, 600);
+            columns[i].setStrokeWidth(3);
+            content.getChildren().add(columns[i]);
+        }
     }
 
     public void generateNeedles(int num) {
@@ -62,13 +52,13 @@ public class Main extends Application {
             theta = -1 * (randy.nextInt(180) + randy.nextDouble());
             y = randy.nextInt(601) + randy.nextDouble();
             x = randy.nextInt(801) + randy.nextDouble();
-            // calcular la segunda coordenada de la aguja
+            // calcular el segundo par de coordenadas de la aguja
             dy = y + Math.sin(Math.toRadians(theta)) * (dVerticales);
             dx = x + Math.cos(Math.toRadians(theta)) * (dVerticales);
             // agregar la aguja al ArrayList<Line>
             needles.add(new Line(x, y, dx, dy));
             // validar si cruzan o no una columna
-            if (intersects(x, dx)){
+            if (intersects(x, dx)) {
                 nSuccess++;
                 needles.get(i).setStroke(Color.RED);
             } else {
@@ -79,33 +69,24 @@ public class Main extends Application {
     }
 
     public boolean intersects(double x, double dx) {
-        if ((x < 0 && dx > 0)
-        || (dx < 0 && x > 0)) {
-            return true;
-        } else if ((x < 200 && dx > 200)
-                || (dx < 200 && x > 200)) {
-            return true;
-        } else if ((x < 400 && dx > 400)
-                || (dx < 400 && x > 400)) {
-            return true;
-        } else if ((x < 600 && dx > 600)
-                || (dx < 600 && x > 600)) {
-            return true;
-        } else if ((x < 800 && dx > 800)
-                || (dx < 800 && x > 800)) {
-            return true;
-        } else
-            return false;
+        // comprobar la colision con la coordenada x de cada columna
+        // coordenada x de columna i = dVerticales * i
+        for (int i = 0; i < columns.length; i++){
+            if ((x < dVerticales * i && dx > dVerticales * i) || (dx < dVerticales * i && x > dVerticales * i)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public double approximatePI() {
-        return (2*(double)(nExperiments/nSuccess));
+        return (2 * (double)(nExperiments / nSuccess));
     }
 
-    public void results(){
+    public void results() {
         String leftAlignFormat = "| %-16s | %-25s | %-25s |%n";
-        // imprimir tabla de coordenadas dentro del circulo
-        System.out.println("\n***AGUJAS LANZADAS***");
+        // imprimir tabla de pares de coordenadas dentro del circulo
+        System.out.println("\n*** AGUJAS LANZADAS ***");
         System.out.format("+------------------+--------------------------+-----------------------------+%n");
         System.out.format("| AGUJA N          | (x1, y1)                 | (x2, y2)                   |%n");
         System.out.format("+------------------+--------------------------+-----------------------------+%n");
@@ -119,7 +100,7 @@ public class Main extends Application {
         }
         System.out.format("+------------------+---------------------------+---------------------------+%n");
         // imprimir resultados
-        System.out.println("\n***RESULTADOS***");
+        System.out.println("\n*** RESULTADOS ***");
         System.out.println("EXITOS (ROJO)    = " + (int)nSuccess);
         System.out.println("FALLOS (AZUL)    = " + (int)(nExperiments - nSuccess));
         System.out.println("APROXIMADO DE PI = " + approximatePI());
