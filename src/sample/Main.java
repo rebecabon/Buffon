@@ -18,7 +18,6 @@ public class Main extends Application {
 
     public ArrayList<Line> needles = new ArrayList<Line>(); // objetos de agujas almacenados
     public Group content = new Group(); // grupo de las lineas lanzadas (agujas)
-    public VBox layout = new VBox(2); // panel a desplegar
     public Line[] columns = new Line[5]; // arreglo de columnas
     public Random randy = new Random();
     public int dVerticales = 200; // distancia entre verticales
